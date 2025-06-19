@@ -8,10 +8,7 @@ const wss = new WebSocket.Server({ server });
 
 wss.on('connection', ws => {
   console.log('🔌 Client connected');
-
-  ws.on('close', () => {
-    console.log('❌ Client disconnected');
-  });
+  ws.on('close', () => console.log('❌ Client disconnected'));
 });
 
 app.get('/', (req, res) => {
@@ -27,11 +24,13 @@ function sendCode(code) {
   });
 }
 
-// Export for use in other files
-module.exports = { sendCode };
-
 // Start server
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
   console.log(`✅ WebSocket server running on port ${PORT}`);
 });
+
+// ✅ TEMP TEST: Broadcast a code every 10 seconds
+setInterval(() => {
+  sendCode('TESTCODE123');
+}, 10000);
