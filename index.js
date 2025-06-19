@@ -24,13 +24,10 @@ function sendCode(code) {
   });
 }
 
-// Start server
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
   console.log(`✅ WebSocket server running on port ${PORT}`);
 });
 
-// ✅ TEMP TEST: Broadcast a code every 10 seconds
-setInterval(() => {
-  sendCode('TESTCODE123');
-}, 10000);
+// ✅ Export to be used in extractor (if you deploy together)
+module.exports = { sendCode };
