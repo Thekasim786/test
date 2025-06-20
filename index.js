@@ -16,11 +16,16 @@ wss.on('connection', ws => {
 
     console.log(`📥 [${time}] Code received: ${code}`);
 
-    // Broadcast to all other clients
+    const payload = JSON.stringify({
+      type: 'message',
+      message: code
+    });
+
+    // Broadcast to all other clients in the correct format
     wss.clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(code);
-        console.log(`📤 [${time}] Forwarded to client: ${code}`);
+        client.send(payload);
+        console.log(`📤 [${time}] Forwarded to client: ${payload}`);
       }
     });
   });
