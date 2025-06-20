@@ -7,27 +7,34 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', ws => {
-  console.log('🔌 Client connected');
-  ws.on('close', () => console.log('❌ Client disconnected'));
+  const ip = ws._socket.remoteAddress;
+  console.log(`🔌 Client connected from ${ip}`);
+
+  ws.on('message', message => {
+    const code = message.toString().trim();
+    const time = new Date().toLocaleTimeString();
+
+    console.log(`📥 [${time}] Code received: ${code}`);
+
+    // Broadcast to all other clients
+    wss.clients.forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(code);
+        console.log(`📤 [${time}] Forwarded to client: ${code}`);
+      }
+    });
+  });
+
+  ws.on('close', () => {
+    console.log(`❌ Client disconnected: ${ip}`);
+  });
 });
 
 app.get('/', (req, res) => {
-  res.send('Stake WebSocket server running.');
+  res.send('✅ Stake WebSocket server is live.');
 });
-
-function sendCode(code) {
-  console.log(`📤 Broadcasting code: ${code}`);
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(code);
-    }
-  });
-}
 
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
-  console.log(`✅ WebSocket server running on port ${PORT}`);
+  console.log(`🚀 WebSocket server running on port ${PORT}`);
 });
-
-// ✅ Export to be used in extractor (if you deploy together)
-module.exports = { sendCode };
